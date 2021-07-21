@@ -19,17 +19,20 @@ def start(IP,PORT):
     data = np.array(
         [12000, 56.25, -356, 1003, 23.56, 23.89, 6687, 32.56, -1200, 68.72, 48.63, 2963, 0, 1, 0, 1, 0, 1, 0, 1,
          0, 1, 0, 3, 2])
-
+    tic = time.time()*1000
     while not dash.stop:
-        if c.connected:
-            recevied = c.read()
-            dash.data = rand_data();
-            c.send_data(encode_data(dash.data))
-        else:
-            c.connect()
+        dash.data = rand_data();
+        if time.time()*1000-tic>1000:
+            tic = time.time()*1000
+            if c.connected:
+                recevied = c.read()
+
+                c.send_data(encode_data(dash.data))
+            else:
+                c.connect()
+
         dash.master.update_idletasks()
         dash.master.update()
-        time.sleep(1)
     c.disconnect()
 
 

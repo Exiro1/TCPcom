@@ -61,14 +61,14 @@ class Dashboard:
 
         # CONDITIONNEMENT
         # Mode Hybride
-        if self.hybride_mode == "False":
+        if self.hybride_mode == 0:
             self.hy_background = "white"
             self.hy_police = "black"
         else:
             self.hy_background = "red"
             self.hy_police = "white"
         # Etat ICE Clutch engine
-        if self.ice_clutch1 == "True":
+        if self.ice_clutch1 == 1:
             self.clutch1_background = "red"
             self.clutch1_value = "ON"
             self.clutch1_contour = "red"
@@ -77,7 +77,7 @@ class Dashboard:
             self.clutch1_contour = "white"
             self.clutch1_value = "OFF"
         # Etat ICE Clutch motor
-        if self.ice_clutch2 == "True":
+        if self.ice_clutch2 == 1:
             self.clutch2_background = "red"
             self.clutch2_value = "ON"
             self.clutch2_contour = "red"
@@ -86,7 +86,7 @@ class Dashboard:
             self.clutch2_contour = "white"
             self.clutch2_value = "OFF"
         # Fuel mode
-        if self.fuel_mode == "True":
+        if self.fuel_mode == 1:
             self.fuel_mode_value = "ON"
             self.fuel_mode_background = "red"
             self.fuel_mode_contour = "red"
@@ -95,21 +95,21 @@ class Dashboard:
             self.fuel_mode_background = "black"
             self.fuel_mode_contour = "white"
         # Etat connexion 3g
-        if self.connexion == "True":
+        if self.connexion == 1:
             self.etat_connexion_background = "#03FF00"
             self.etat_connexion_label = "black"
         else:
             self.etat_connexion_background = "red"
             self.etat_connexion_label = "white"
         # Etat connexion GPS
-        if self.gps == "True":
+        if self.gps == 1:
             self.etat_gps_background = "#03FF00"
             self.etat_gps_label = "black"
         else:
             self.etat_gps_background = "red"
             self.etat_gps_label = "white"
         # Etat Breaks
-        if self.break_value == "False":
+        if self.break_value == 0:
             self.breaks_background = "black"
         else:
             self.breaks_background = "red"
@@ -156,6 +156,8 @@ class Dashboard:
     def update_track(self):
         self.num_lap_label.configure(text="8/11")
         self.state_label.configure(text=str(self.soc) + '%')
+
+        self.master.configure(bg="black", highlightbackground=self.hy_background, highlightcolor=self.hy_background)
 
         if self.soc < self.target_soc:
 
@@ -219,7 +221,11 @@ class Dashboard:
 
         self.dec_speed_label.configure(text="." + str(int(self.speed * 10 % 10)) + " km/h")
 
-        self.updateID = self.master.after(500, self.update_track)
+        self.breaks_label.configure(bg=self.breaks_background)
+
+        self.mode_label.configure(bg=self.hy_background)
+
+        self.updateID = self.master.after(200, self.update_track)
 
     def create_track(self):
         if self.updateID != 0:
@@ -550,6 +556,8 @@ class Dashboard:
         #self.rpm_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
         #                       height=self.height_screen / 8 - self.space)
 
+        self.master.configure(bg="black", highlightbackground=self.hy_background, highlightcolor=self.hy_background)
+
         self.hybride_mode_label.configure(bg=self.hy_background, fg=self.hy_police, font=self.font_hy)
 
         self.engine_torque_value_label.configure(text=self.engine_torque)
@@ -591,6 +599,9 @@ class Dashboard:
 
         self.fuel_mode_label.configure(text=self.fuel_mode_value)
 
+        self.fuel_mode_label.configure(bg=self.fuel_mode_frame["bg"])
+        self.fuel_label.configure(bg=self.fuel_mode_frame["bg"])
+
         self.lipo_value_label.configure(text="%s%s" % (self.lipo, "%"))
 
         # 3G
@@ -611,7 +622,7 @@ class Dashboard:
 
         self.speed_value_label.configure(text=self.speed)
 
-        self.updateID = self.master.after(500, self.update_test)
+        self.updateID = self.master.after(200, self.update_test)
 
     def create_test(self):
         if self.updateID != 0:
@@ -628,7 +639,7 @@ class Dashboard:
         self.master.rowconfigure(8,weight=2)
 
         self.master.columnconfigure(0,weight=1, minsize=0)
-        self.master.columnconfigure(1,weight=1, minsize=0)
+        self.master.columnconfigure(1,weight=1, minsize=self.width_screen/8)
         self.master.columnconfigure(2,weight=4, minsize=0)
         self.master.columnconfigure(3,weight=1, minsize=0)
         self.master.columnconfigure(4,weight=1, minsize=0)
@@ -1038,6 +1049,7 @@ class Dashboard:
         self.ice_clutch2_value_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
                                 height=self.height_screen / 8 - self.space)
         self.ice_clutch2_value_frame.grid(column=6, row=5)
+
         self.ice_clutch2_value_frame.configure(bg=self.clutch2_background, highlightbackground=self.clutch2_contour,
                                                highlightthickness=2)
         self.ice_clutch2_value_frame.pack_propagate(0)
@@ -1106,6 +1118,7 @@ class Dashboard:
         self.connexion_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
                                      height=self.height_screen / 8 - self.space)
         self.connexion_frame.grid(column=5, row=7)
+
         self.connexion_frame.configure(bg=self.etat_connexion_background)
         self.connexion_frame.pack_propagate(0)
 
