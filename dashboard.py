@@ -18,7 +18,13 @@ import csv
 class Dashboard:
 
 
-
+    def kill(self):
+        self.stop = True
+        self.master.destroy()
+        if self.updateID != 0:
+            self.master.after_cancel(self.updateID)
+        if self.upd_dash != 0:
+            self.master.after_cancel(self.upd_dash)
 
     def update_dash(self):
 
@@ -107,11 +113,13 @@ class Dashboard:
             self.breaks_background = "black"
         else:
             self.breaks_background = "red"
-        self.master.after(100, self.update_dash)
+        self.upd_dash = self.master.after(100, self.update_dash)
 
     def __init__(self, master, data):
         self.master = master
         self.updateID = 0
+        self.upd_dash = 0
+        self.stop = False
         self.data = data
         self.update_dash()
         # FENETRE PRINCIPALE
@@ -133,8 +141,8 @@ class Dashboard:
         self.font_titre_signaux = ("Arial", int(self.space * 1.2), "bold")
 
         self.master.attributes('-fullscreen', True)  # affichage plein écran
-        self.master.bind("<Escape>", lambda e: self.master.destroy())  # <ESC> pour pouvoir fermer le programe
-        self.master.bind("<Button-1>", lambda e: self.master.destroy())  # <CLIQUER> pour pouvoir fermer le programe
+        self.master.bind("<Escape>", lambda e: self.kill())  # <ESC> pour pouvoir fermer le programe
+        self.master.bind("<Button-1>", lambda e: self.kill())  # <CLIQUER> pour pouvoir fermer le programe
         self.master.bind("<Left>", lambda e: self.create_track())  # <Left> pour afficher le menu track
         self.master.bind("<Right>", lambda e: self.create_test())  # <Right> pour afficher le menu test
 

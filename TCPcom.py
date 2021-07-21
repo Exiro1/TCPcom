@@ -64,10 +64,10 @@ def encode_data(data):
 
 class TCPCOM:
 
-    def __init__(self):
+    def __init__(self, IP,PORT):
         self.connected = False
-        self.HOST = '46.105.28.70'
-        self.PORT = 11000
+        self.HOST = IP
+        self.PORT = PORT
         self.client = None
 
         while not self.connect():
