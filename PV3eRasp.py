@@ -1,18 +1,29 @@
 import getopt
+import os
 import sys
+import threading
 import time
 from random import random
 from tkinter import Tk
 
+
 from TCPcom import TCPCOM, encode_data
 import numpy as np
-
+from CANcom import VESC
 from dashboard import Dashboard
 
 
+# export DISPLAY=:0.0
+# python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
 def start(IP,PORT):
-    c = TCPCOM(IP, PORT)
 
+    os.system("export DISPLAY=:0.0")
+    c = TCPCOM(IP, PORT)
+    vesc = VESC()
+
+    #start CAN listening thread
+    listen_thr = threading.Thread(target=vesc.listen_thread)
+    listen_thr.start()
     window = Tk()
     dash = Dashboard(window,rand_data())
 
@@ -20,13 +31,13 @@ def start(IP,PORT):
         [12000, 56.25, -356, 1003, 23.56, 23.89, 6687, 32.56, -1200, 68.72, 48.63, 2963, 0, 1, 0, 1, 0, 1, 0, 1,
          0, 1, 0, 3, 2])
     tic = time.time()*1000
+
     while not dash.stop:
         dash.data = rand_data();
-        if time.time()*1000-tic>1000:
+        if time.time()*1000-tic > 1000:
             tic = time.time()*1000
             if c.connected:
                 recevied = c.read()
-
                 c.send_data(encode_data(dash.data))
             else:
                 c.connect()
@@ -34,6 +45,8 @@ def start(IP,PORT):
         dash.master.update_idletasks()
         dash.master.update()
     c.disconnect()
+    vesc.stop = True
+    listen_thr.join()
 
 
 
