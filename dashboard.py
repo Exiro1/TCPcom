@@ -30,34 +30,42 @@ class Dashboard:
 
                 # VARIABLES DU DASHBOARD
         self.engine_rpm = float("{:.2f}".format(self.data[0]))
-        self.engine_torque = float(20)  # Nm
         self.engine_temp = float("{:.2f}".format(self.data[1]))  # °C
+        self.temp_water = float("{:.2f}".format(self.data[2]))
+        self._lambda = float("{:.2f}".format(self.data[3]))
         self.p_fuel = float("{:.2f}".format(self.data[4]))  # bars
-        self.fuel_cons = float(0)  # mL
-        self.ice_clutch1 = 0  # True si ICE Clutch ON
+        self.lipo = float("{:.2f}".format(self.data[5]))  # %
         self.motor_rpm = float("{:.2f}".format(self.data[6]))
+        self.superc = float("{:.2f}".format(self.data[7]))
         self.motor_torque = float("{:.2f}".format(self.data[8]))
         self.motor_temp = float("{:.2f}".format(self.data[9]))
-        self.distance = float("{:.2f}".format(self.data[11]))  # km
-        self.efficiency = float(0)  # km/L
-        self.ice_clutch2 = 1  # False si ICE Clutch OFF
-        self.fuel_mode = self.data[19]  # True si mode FUEL ON
-        self.soc = float(0)  # %
-        self.lipo = float("{:.2f}".format(self.data[5]))  # %
-        self.connexion = 1  # True si état de connexion 3g OK
-        self.gps = 1  # True si connexion GPS OK
         self.speed = float("{:.2f}".format(self.data[10]))  # km/h
-        self.hybride_mode = self.data[24]==3  # False si mode HY pas activé
-        self.time = float(0)  # en millisecondes
-        self.break_value = 1
-        self.turn_regen = 10
-        self.value_regen = 10  # en pourcent
-        self.target_speed = float("{:.2f}".format(self.data[10]+3))  # en km
-        self.turn_ice = 2
-        self.race_delta = 3.2
-        self.live_delta = -1.5
-        self.n_1_delta = 0.6
-        self.target_soc = 2
+        self.distance = float("{:.2f}".format(self.data[11]))  # km
+
+        self.fuel_mode = self.data[19]  # True si mode FUEL ON
+
+        self.hybride_mode = self.data[24] == 3  # False si mode HY pas activé
+
+
+
+        self.engine_torque = float("{:.2f}".format(self.data[25]))  # Nm
+        self.fuel_cons = float("{:.2f}".format(self.data[26]))  # mL
+        self.ice_clutch1 = self.data[27]  # True si ICE Clutch ON
+        self.efficiency = float("{:.2f}".format(self.data[28]))  # km/L
+        self.ice_clutch2 = self.data[29]  # False si ICE Clutch OFF
+        self.soc = float("{:.2f}".format(self.data[30]))  # %
+        self.connexion = self.data[31]  # True si état de connexion 3g OK
+        self.gps = self.data[32]  # True si connexion GPS OK
+        self.time = float("{:.2f}".format(self.data[33]))  # en millisecondes
+        self.break_value = self.data[34]
+        self.turn_regen = int(self.data[35])
+        self.value_regen = int(self.data[36])  # en pourcent
+        self.target_speed = float("{:.2f}".format(self.data[37]))  # en km
+        self.turn_ice = int(self.data[38])
+        self.race_delta = float("{:.2f}".format(self.data[39]))
+        self.live_delta = float("{:.2f}".format(self.data[40]))
+        self.n_1_delta = float("{:.2f}".format(self.data[41]))
+        self.target_soc = float("{:.2f}".format(self.data[42]))
 
         # CONDITIONNEMENT
         # Mode Hybride
@@ -155,57 +163,78 @@ class Dashboard:
 
     def update_track(self):
         self.num_lap_label.configure(text="8/11")
-        self.state_label.configure(text=str(self.soc) + '%')
+        mode = 'ON'
+        if self.fuel_mode == 0:
+            mode = 'OFF'
+        self.soc_value_label.configure(text=str(self.soc) + '%')
+
+        self.state_label.configure(text=mode)
 
         self.master.configure(bg="black", highlightbackground=self.hy_background, highlightcolor=self.hy_background)
 
         if self.soc < self.target_soc:
 
-            self.TSOC_full_jauge_frame.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
+            self.TSOC_part1.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
                                                  height=self.height_screen / 10 - self.space)
-
-            self.TSOC_empty1_jauge_frame.configure(bg="black",
+            self.TSOC_part1.grid(column=0, row=0)
+            self. TSOC_part2.configure(bg="black",
                                                    width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
                                                        "width"],
                                                    height=self.height_screen / 10 - self.space)
-
-            self.TSOC_empty2_jauge_frame.configure(bg="black",
+            self.TSOC_part2.grid(column=1, row=0)
+            self. TSOC_part3.configure(bg="black",
                                                    width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
                                                        "width"],
                                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_cursor_jauge_frame.configure(bg="white", width=0.01 * self.TSOC_jauge_frame["width"],
                                                    height=self.height_screen / 10 - self.space)
-
+            self.TSOC_cursor_jauge_frame.grid(column=2, row=0)
         elif self.soc > self.target_soc:
-            self.TSOC_full1_jauge_frame.configure(bg="green",
+            self.TSOC_part1.configure(bg="green",
                                                   width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
                                                   height=self.height_screen / 10 - self.space)
-
-            self.TSOC_full2_jauge_frame.configure(bg="green",
+            self.TSOC_part1.grid(column=0, row=0)
+            self.TSOC_part2.configure(bg="green",
                                                   width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
                                                       "width"],
                                                   height=self.height_screen / 10 - self.space)
-
-            self.TSOC_empty_jauge_frame.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
+            self.TSOC_part2.grid(column=2, row=0)
+            self.TSOC_part3.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                 "width"],
                                                   height=self.height_screen / 10 - self.space)
-
+            self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_cursor_jauge_frame.configure(bg="white", width=0.01 * self.TSOC_jauge_frame["width"],
                                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_cursor_jauge_frame.grid(column=1, row=0)
 
         elif self.soc == self.target_soc:
-            self.TSOC_full_jauge_frame.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
+            self.TSOC_part1.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
                                                  height=self.height_screen / 10 - self.space)
-
-            self.TSOC_empty_jauge_frame.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
+            self.TSOC_part1.grid(column=0, row=0)
+            self.TSOC_part2.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                 "width"],
                                                   height=self.height_screen / 10 - self.space)
+            self.TSOC_part2.grid(column=1, row=0)
+
+            self.TSOC_part3.configure(width=0, bg = 'black')
+            self.TSOC_part3.grid(column=3, row=0)
+
+
 
         self.TSOC_num_label.configure(text=str(self.target_soc) + '%')
-
-        self.num_liveD_label.configure(text=str(self.live_delta) + 's')
-
-        self.nD_label.configure(text=str(self.n_1_delta) + 's')
+        fg = 'green'
+        if self.race_delta<0:
+            fg = 'red'
+        self.num_raceD_label.configure(text = str(self.race_delta) + 's', fg = fg)
+        fg = 'green'
+        if self.live_delta < 0:
+            fg = 'red'
+        self.num_liveD_label.configure(text=str(self.live_delta) + 's',fg=fg)
+        fg = 'green'
+        if self.n_1_delta < 0:
+            fg = 'red'
+        self.nD_label.configure(text=str(self.n_1_delta) + 's', fg=fg)
 
         self.num_turn_regen_label.configure(text=str(self.turn_regen))
 
@@ -224,6 +253,10 @@ class Dashboard:
         self.breaks_label.configure(bg=self.breaks_background)
 
         self.mode_label.configure(bg=self.hy_background)
+
+        self.num_time_label.configure(text=str(self.time))
+
+        self.num_turn_ICE_label.configure(text=str(self.turn_ice))
 
         self.updateID = self.master.after(200, self.update_track)
 
@@ -269,9 +302,9 @@ class Dashboard:
         self.SOC_label.pack()
         self.SOC_label.configure(bg=self.SOC_frame["bg"], fg="white", font=("Arial 25 bold"))
 
-        self.state_label = Label(self.SOC_frame, text=str(self.soc) + '%')
-        self.state_label.pack(expand=True)
-        self.state_label.configure(bg=self.SOC_frame["bg"], fg="yellow", font=("Arial 50 bold"))
+        self.soc_value_label = Label(self.SOC_frame, text=str(self.soc) + '%')
+        self.soc_value_label.pack(expand=True)
+        self.soc_value_label.configure(bg=self.SOC_frame["bg"], fg="yellow", font=("Arial 50 bold"))
 
         self.TSOC_frame = Frame(self.master)
         self.TSOC_frame.grid(column=1, row=0, columnspan=4)
@@ -284,25 +317,25 @@ class Dashboard:
 
         if self.soc < self.target_soc:
 
-            self.TSOC_full_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self. TSOC_part1 = Frame(self.TSOC_jauge_frame,
                                                width=self.soc / 100 * self.TSOC_jauge_frame["width"],
                                                height=self.height_screen / 10 - self.space)
-            self.TSOC_full_jauge_frame.grid(column=0, row=0)
-            self.TSOC_full_jauge_frame.configure(bg="green")
+            self. TSOC_part1.grid(column=0, row=0)
+            self. TSOC_part1.configure(bg="green")
 
-            self.TSOC_empty1_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self. TSOC_part2 = Frame(self.TSOC_jauge_frame,
                                                  width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
                                                      "width"],
                                                  height=self.height_screen / 10 - self.space)
-            self.TSOC_empty1_jauge_frame.grid(column=1, row=0)
-            self.TSOC_empty1_jauge_frame.configure(bg="black")
+            self. TSOC_part2.grid(column=1, row=0)
+            self. TSOC_part2.configure(bg="black")
 
-            self.TSOC_empty2_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self. TSOC_part3 = Frame(self.TSOC_jauge_frame,
                                                  width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
                                                      "width"],
                                                  height=self.height_screen / 10 - self.space)
-            self.TSOC_empty2_jauge_frame.grid(column=3, row=0)
-            self.TSOC_empty2_jauge_frame.configure(bg="black")
+            self. TSOC_part3.grid(column=3, row=0)
+            self. TSOC_part3.configure(bg="black")
 
             self.TSOC_cursor_jauge_frame = Frame(self.TSOC_jauge_frame,
                                                  width=0.01 * self.TSOC_jauge_frame["width"],
@@ -311,25 +344,25 @@ class Dashboard:
             self.TSOC_cursor_jauge_frame.configure(bg="white")
 
         elif self.soc > self.target_soc:
-            self.TSOC_full1_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self.TSOC_part1 = Frame(self.TSOC_jauge_frame,
                                                 width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
                                                 height=self.height_screen / 10 - self.space)
-            self.TSOC_full1_jauge_frame.grid(column=0, row=0)
-            self.TSOC_full1_jauge_frame.configure(bg="green")
+            self.TSOC_part1.grid(column=0, row=0)
+            self.TSOC_part1.configure(bg="green")
 
-            self.TSOC_full2_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self.TSOC_part2 = Frame(self.TSOC_jauge_frame,
                                                 width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
                                                     "width"],
                                                 height=self.height_screen / 10 - self.space)
-            self.TSOC_full2_jauge_frame.grid(column=2, row=0)
-            self.TSOC_full2_jauge_frame.configure(bg="green")
+            self.TSOC_part2.grid(column=2, row=0)
+            self.TSOC_part2.configure(bg="green")
 
-            self.TSOC_empty_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self.TSOC_part3 = Frame(self.TSOC_jauge_frame,
                                                 width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                                                     "width"],
                                                 height=self.height_screen / 10 - self.space)
-            self.TSOC_empty_jauge_frame.grid(column=3, row=0)
-            self.TSOC_empty_jauge_frame.configure(bg="black")
+            self.TSOC_part3.grid(column=3, row=0)
+            self.TSOC_part3.configure(bg="black")
 
             self.TSOC_cursor_jauge_frame = Frame(self.TSOC_jauge_frame,
                                                  width=0.01 * self.TSOC_jauge_frame["width"],
@@ -338,18 +371,26 @@ class Dashboard:
             self.TSOC_cursor_jauge_frame.configure(bg="white")
 
         elif self.soc == self.target_soc:
-            self.TSOC_full_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self. TSOC_part1 = Frame(self.TSOC_jauge_frame,
                                                width=self.soc / 100 * self.TSOC_jauge_frame["width"],
                                                height=self.height_screen / 10 - self.space)
-            self.TSOC_full_jauge_frame.grid(column=0, row=0)
-            self.TSOC_full_jauge_frame.configure(bg="green")
+            self. TSOC_part1.grid(column=0, row=0)
+            self. TSOC_part1.configure(bg="green")
 
-            self.TSOC_empty_jauge_frame = Frame(self.TSOC_jauge_frame,
+            self.TSOC_part2 = Frame(self.TSOC_jauge_frame,
                                                 width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                                                     "width"],
                                                 height=self.height_screen / 10 - self.space)
-            self.TSOC_empty_jauge_frame.grid(column=1, row=0)
-            self.TSOC_empty_jauge_frame.configure(bg="black")
+            self.TSOC_part2.grid(column=1, row=0)
+            self.TSOC_part2.configure(bg="black")
+
+            self.TSOC_part3 = Frame(self.TSOC_jauge_frame,
+                                    width=0,
+                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part3.grid(column=3, row=0)
+            self.TSOC_part3.configure(bg="black")
+
+
 
         self.TSOC_num_frame = Frame(self.TSOC_frame)
         self.TSOC_num_frame.grid(column=0, row=1, sticky='w')
@@ -583,15 +624,17 @@ class Dashboard:
 
         self.efficiency_value_label.configure(text=self.efficiency)
 
-        self.ice_clutch2_value_label.configure(text=self.clutch2_value)
+
 
         self.ice_clutch2_value_frame.configure(bg=self.clutch2_background, highlightbackground=self.clutch2_contour,
                                                highlightthickness=2)
 
+        self.ice_clutch2_value_label.configure(text=self.clutch2_value,bg = self.ice_clutch2_value_frame["bg"])
+
 
         self.ice_clutch1_value_frame.configure(bg=self.clutch1_background, highlightbackground=self.clutch1_contour)
 
-        self.ice_clutch1_value_label.configure(text = self.clutch1_value)
+        self.ice_clutch1_value_label.configure(text = self.clutch1_value, bg = self.ice_clutch1_value_frame["bg"])
         # self.spacer ligne blanch
 
         self.fuel_mode_frame.configure(bg=self.fuel_mode_background, highlightbackground=self.fuel_mode_contour,
@@ -602,7 +645,7 @@ class Dashboard:
         self.fuel_mode_label.configure(bg=self.fuel_mode_frame["bg"])
         self.fuel_label.configure(bg=self.fuel_mode_frame["bg"])
 
-        self.lipo_value_label.configure(text="%s%s" % (self.lipo, "%"))
+        self.lipo_value_label.configure(text="%s%s" % (int(self.lipo)/10, "%"))
 
         # 3G
 
@@ -617,6 +660,10 @@ class Dashboard:
         self.gps_frame.pack_propagate(0)
 
         self.gps_label.configure(bg=self.gps_frame["bg"], fg=self.etat_gps_label, font=self.font_titre_donnees)
+
+
+        self.soc_value_label.configure(text = str(int(self.soc)) + '%')
+
 
         # Speed
 
