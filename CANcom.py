@@ -90,7 +90,7 @@ class VESC:
         array.reverse()
         dlc = msg.dlc
         if id & 0xFF00 == 0x900:
-            print("PACKET 1")
+            # print("PACKET 1")
             self.rpm = self.toInt32(array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4])
             print("RPM : " + str(self.rpm))
             self.current = self.toInt16(array[3] << 8 | array[2])
@@ -98,7 +98,7 @@ class VESC:
             self.dutyc = self.toInt16(array[1] << 8 | array[0]) / 1000.0
             print("duty Cycle : " + str(self.dutyc))
         elif id & 0xFF00 == 0xe00:
-            print("PACKET 2")
+            #print("PACKET 2")
             self.amph = array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4]
             self.amph = self.amph / 1000
             print("AMP_H : " + str(self.amph))
@@ -106,7 +106,7 @@ class VESC:
             self.amphc = self.amphc / 1000
             print("AMP_HC : " + str(self.amphc))
         elif id & 0xFF00 == 0xf00:
-            print("PACKET 3")
+            #print("PACKET 3")
             self.wath = array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4]
             self.wath = self.wath / 1000
             print("WATT_H : " + str(self.wath))
@@ -114,7 +114,7 @@ class VESC:
             self.wathc = self.wathc / 1000
             print("WATT_HC : " + str(self.wathc))
         elif id & 0xFF00 == 0x1000:
-            print("PACKET 4")
+            #print("PACKET 4")
             self.temp_fet = self.toInt16(array[7] << 8 | array[6]) * 0.1
             print("Temp fet : " + str(self.temp_fet))
             self.temp_mot = self.toInt16(array[5] << 8 | array[4]) * 0.1
@@ -124,7 +124,7 @@ class VESC:
             self.pid_pos = self.toInt16(array[1] << 8 | array[0]) * 0.5
             print("pid pos : " + str(self.pid_pos))
         elif id & 0xFF00 == 0x1b00:
-            print("PACKET 5")
+            #print("PACKET 5")
             self.tacho = array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4]
             print("TACHO : " + str(self.tacho))
             self.vin = self.toInt16(array[3] << 8 | array[2]) * 0.1
@@ -133,19 +133,15 @@ class VESC:
             print("lol")
             self.bus.send(msg)
         self.updateData()
-        print("\n")
+        #print("\n")
 
     def updateData(self):
         self.torque = (self.current-self.i0)*self.Kq
 
-
-
-    #
     def listen_thread(self):
         while not self.stop:
             message = self.bus.recv(1.0)  # Timeout in seconds.
             if message is None:
                 print('Timeout occurred, no message.')
-            else :
+            else:
                 self.decode(message)
-                self.set_duty_cycle(0.3)

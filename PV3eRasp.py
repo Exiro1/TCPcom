@@ -12,28 +12,31 @@ import numpy as np
 from CANcom import VESC
 from dashboard import Dashboard
 
+
+
+
 # export DISPLAY=:0.0
 # python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
 def start(IP,PORT):
 
+    #pour execution depuis pc
     os.system("export DISPLAY=:0.0")
+
+    #configuration du module CAN
     os.system("sudo ip link set can0 up type can bitrate 500000")
     os.system("sudo ifconfig can0 txqueuelen 65536")
 
     c = TCPCOM(IP, PORT)
     vesc = VESC(0,1)
 
-    #start CAN listening thread
+    #lancement du thread d'écoute du port CAN
     listen_thr = threading.Thread(target=vesc.listen_thread)
     listen_thr.start()
-    data = np.array(
-        [12000, 56.25, -356, 1003, 23.56, 23.89, 6687, 32.56, -1200, 68.72, 48.63, 2963, 0, 1, 0, 1, 0, 1, 0, 1,
-         0, 1, 0, 3, 2])
+
     data = rand_data()
 
     window = Tk()
-    dash = Dashboard(window,rand_data())
-
+    dash = Dashboard(window,data)
 
     tic = time.time()*1000
 
@@ -41,6 +44,7 @@ def start(IP,PORT):
         # recuperer les données ici
         dash.data = get_data(vesc,c)
 
+        # envoi des données toutes les secondes
         if time.time()*1000-tic > 1000:
             tic = time.time()*1000
             if c.connected:
@@ -63,7 +67,7 @@ def rand_data():
     data = np.array([])
     for i in range(12):
         data =np.append(data, np.random.rand()*1000)
-    for i in range(11):
+    for i in range(16):
         data = np.append(data, np.random.randint(2))
     data =np.append(data,np.random.randint(1,8))
     data =np.append(data,np.random.randint(0,8))
@@ -71,14 +75,9 @@ def rand_data():
 
     data = np.append(data, np.random.rand() * 1000)
     data = np.append(data, np.random.rand() * 1000)
-    data = np.append(data, np.random.randint(2))
     data = np.append(data, np.random.rand() * 1000)
-    data = np.append(data, np.random.randint(2))
     data = np.append(data, np.random.rand() * 100)
-    data = np.append(data, np.random.randint(2))
-    data = np.append(data, np.random.randint(2))
     data = np.append(data, np.random.rand() * 1000)
-    data = np.append(data, np.random.randint(2))
     data = np.append(data, np.random.randint(20))
     data = np.append(data, np.random.rand() * 100)
     data = np.append(data, np.random.rand() * 100)
@@ -100,9 +99,9 @@ def get_data(vesc, tcp):
     newdata[6] = vesc.rpm
     newdata[8] = vesc.torque
     newdata[9] = vesc.temp_mot
-    newdata[31] = 0
+    newdata[25] = 0
     if tcp.connected:
-        newdata[31] = 1
+        newdata[25] = 1
 
 
     return newdata
