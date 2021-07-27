@@ -45,6 +45,8 @@ def start(IP,PORT):
             tic = time.time()*1000
             if c.connected:
                 recevied = c.read()
+                if recevied is not None:
+                    on_receive(recevied)
                 c.send_data(encode_data(dash.data))
             else:
                 c.connect()
@@ -87,6 +89,9 @@ def rand_data():
     data = np.append(data, np.random.rand() * 100)
 
     return data
+
+def on_receive(msg):
+    pass
 
 
 def get_data(vesc, tcp):

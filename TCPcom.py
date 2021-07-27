@@ -19,7 +19,8 @@ def append_int(data, value, len, mult=1):
     for i in range(len):
         data.append(np.uint8((v >> (len - i - 1) * 8) & 0xff))
 
-
+# si il y a besoin d'ajouter des données à envoyer c'est ici qu'il faut le faire
+# il faudra aussi modifier le matlab pour qu'il traite ces nouvelles données
 def encode_data(data):
     encoded = bytearray()
 
@@ -52,12 +53,18 @@ def encode_data(data):
           | np.uint8(data[19]) << 7
     encoded.append(boo)
 
-    boo = 0x00 | np.uint8(data[20]) | np.uint8(data[21]) << 1 | np.uint8(data[22]) << 2
+    boo = 0x00 | np.uint8(data[20]) | np.uint8(data[21]) << 1 | np.uint8(data[22]) << 2 \
+          | np.uint8(data[23]) << 3 | np.uint8(data[24]) << 4 | np.uint8(data[25]) << 5 | np.uint8(data[26]) << 6 \
+          | np.uint8(data[27]) << 7
     encoded.append(boo)
 
-    append_uint(encoded, data[23], 1)
+    append_uint(encoded, data[28], 1)
 
-    append_uint(encoded, data[24], 1)
+    append_uint(encoded, data[29], 1)
+
+    # ajouter ici
+    # si valeur non signée : append_uint(encoded, <valeur>, facteur)
+    # si valeur signée : append_int(encoded, <valeur>, facteur)
 
     return encoded
 

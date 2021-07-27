@@ -43,21 +43,25 @@ class Dashboard:
         self.distance = float("{:.2f}".format(self.data[11]))  # km
 
         self.fuel_mode = self.data[19]  # True si mode FUEL ON
+        self.ice_clutch1 = self.data[23]  # True si ICE Clutch ON
+        self.ice_clutch2 = self.data[24]  # False si ICE Clutch OFF
+        self.connexion = self.data[25]  # True si état de connexion 3g OK
+        self.gps = self.data[26]  # True si connexion GPS OK
+        self.break_value = self.data[27]
 
-        self.hybride_mode = self.data[24] == 3  # False si mode HY pas activé
+        self.hybride_mode = self.data[28] == 3  # False si mode HY pas activé
 
 
 
-        self.engine_torque = float("{:.2f}".format(self.data[25]))  # Nm
-        self.fuel_cons = float("{:.2f}".format(self.data[26]))  # mL
-        self.ice_clutch1 = self.data[27]  # True si ICE Clutch ON
-        self.efficiency = float("{:.2f}".format(self.data[28]))  # km/L
-        self.ice_clutch2 = self.data[29]  # False si ICE Clutch OFF
-        self.soc = float("{:.2f}".format(self.data[30]))  # %
-        self.connexion = self.data[31]  # True si état de connexion 3g OK
-        self.gps = self.data[32]  # True si connexion GPS OK
-        self.time = float("{:.2f}".format(self.data[33]))  # en millisecondes
-        self.break_value = self.data[34]
+        self.engine_torque = float("{:.2f}".format(self.data[30]))  # Nm
+        self.fuel_cons = float("{:.2f}".format(self.data[31]))  # mL
+
+        self.efficiency = float("{:.2f}".format(self.data[32]))  # km/L
+
+        self.soc = float("{:.2f}".format(self.data[33]))  # %
+
+        self.time = float("{:.2f}".format(self.data[34]))  # en millisecondes
+
         self.turn_regen = int(self.data[35])
         self.value_regen = int(self.data[36])  # en pourcent
         self.target_speed = float("{:.2f}".format(self.data[37]))  # en km
