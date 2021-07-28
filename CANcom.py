@@ -13,6 +13,7 @@ class VESC:
         self.stop = False
         self.i0 = i0
         self.Kv = kv
+        self.rpm = 0
 
         self.torque = 0
         self.temp_mot = 0
@@ -145,3 +146,4 @@ class VESC:
                 print('Timeout occurred, no message.')
             else:
                 self.decode(message)
+                self.set_RPM(8000)

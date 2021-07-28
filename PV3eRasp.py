@@ -14,7 +14,7 @@ from dashboard import Dashboard
 
 
 
-
+lastmsg = [0,0,0,0,0,0,0]
 # export DISPLAY=:0.0
 # python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
 def start(IP,PORT):
@@ -27,7 +27,7 @@ def start(IP,PORT):
     os.system("sudo ifconfig can0 txqueuelen 65536")
 
     c = TCPCOM(IP, PORT)
-    vesc = VESC(0,1)
+    vesc = VESC(0,1030)
 
     #lancement du thread d'écoute du port CAN
     listen_thr = threading.Thread(target=vesc.listen_thread)
@@ -41,6 +41,11 @@ def start(IP,PORT):
     tic = time.time()*1000
 
     while not dash.stop:
+        if c.connected:
+            recevied = c.read()
+            if recevied is not None:
+                on_receive(recevied)
+
         # recuperer les données ici
         dash.data = get_data(vesc,c)
 
@@ -48,13 +53,11 @@ def start(IP,PORT):
         if time.time()*1000-tic > 1000:
             tic = time.time()*1000
             if c.connected:
-                recevied = c.read()
-                if recevied is not None:
-                    on_receive(recevied)
                 c.send_data(encode_data(dash.data))
             else:
                 c.connect()
-
+        if dash.master is None:
+            continue
         dash.master.update_idletasks()
         dash.master.update()
     c.disconnect()
@@ -90,8 +93,23 @@ def rand_data():
     return data
 
 def on_receive(msg):
-    pass
+    arr = bytearray(msg)
+    lastmsg[0] = arr[1] << 8 | arr[0]
+    lastmsg[1] = 0.1*(arr[3] << 8 | arr[2])
+    lastmsg[2] = arr[5] << 8 | arr[4]
+    lastmsg[3] = 0.1*(toInt16(arr[7] << 8 | arr[6]))
+    lastmsg[4] = 0.1*(toInt16(arr[9] << 8 | arr[8]))
+    lastmsg[5] = 0.1*(toInt16(arr[11] << 8 | arr[10]))
+    lastmsg[6] = arr[13] << 8 | arr[12]
 
+
+def toInt16(value):
+    vint = int(value)
+    if vint >> 15 == 1:
+        toadd = int(-1)
+        toadd =toadd - pow(2,16) + 1
+        vint |= toadd
+    return vint
 
 def get_data(vesc, tcp):
     newdata = rand_data()
@@ -103,7 +121,13 @@ def get_data(vesc, tcp):
     if tcp.connected:
         newdata[25] = 1
 
-
+    newdata[35] = lastmsg[0]
+    newdata[37] = lastmsg[1]
+    newdata[38] = lastmsg[2]
+    newdata[39] = lastmsg[3]
+    newdata[40] = lastmsg[4]
+    newdata[41] = lastmsg[5]
+    newdata[42] = lastmsg[6]
     return newdata
 
 

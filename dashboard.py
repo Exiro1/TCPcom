@@ -133,7 +133,10 @@ class Dashboard:
         self.upd_dash = 0
         self.stop = False
         self.data = data
+        if master is None:
+            return
         self.update_dash()
+
         # FENETRE PRINCIPALE
         self.width_screen = self.master.winfo_screenwidth() - 20  # -20 de highlightthickness=10
         self.height_screen = self.master.winfo_screenheight() - 20  # -20 de highlightthickness=10
