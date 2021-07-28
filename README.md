@@ -5,7 +5,7 @@ Code du Raspberry qui va gerer l'affichage pilote et l'envoi des données au ser
 
 Pré-requis
 
-Un raspberry configurer, une connection internet
+Un raspberry configuré, une connection internet
 
 Installation
 
@@ -13,7 +13,7 @@ A COMPLETER...
 
 Démarrage
 
-Lancer le .py avec les paramettre du serveur (IP et Port) avec cette ligne de commande :
+Lancer le .py avec les paramettres du serveur (IP et Port) avec cette ligne de commande :
 
 pv3eRasp.py -i XX.XX.XX.XX -p YYYYY
 
