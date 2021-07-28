@@ -62,9 +62,11 @@ def encode_data(data):
 
     append_uint(encoded, data[29], 1)
 
+    append_int(encoded, data[43], 2, 100)
+
     # ajouter ici
-    # si valeur non signée : append_uint(encoded, <valeur>, facteur)
-    # si valeur signée : append_int(encoded, <valeur>, facteur)
+    # si valeur non signée : append_uint(encoded, <valeur>, taille, facteur (optionnel) )
+    # si valeur signée : append_int(encoded, <valeur>, taille, facteur (optionnel) )
 
     return encoded
 

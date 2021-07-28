@@ -139,11 +139,11 @@ class VESC:
     def updateData(self):
         self.torque = (self.current-self.i0)*self.Kq
 
-    def listen_thread(self):
+    def listen_can_thread(self):
         while not self.stop:
             message = self.bus.recv(1.0)  # Timeout in seconds.
             if message is None:
                 print('Timeout occurred, no message.')
             else:
                 self.decode(message)
-                self.set_RPM(8000)
+                self.set_RPM(5000)
