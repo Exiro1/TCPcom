@@ -40,7 +40,7 @@ def encode_data(data):
 
     append_uint(encoded, data[7], 2, 100)
 
-    append_int(encoded, data[8], 2)
+    append_int(encoded, data[8], 2, 100)
 
     append_int(encoded, data[9], 2, 100)
 
@@ -63,7 +63,9 @@ def encode_data(data):
     append_uint(encoded, data[29], 1)
 
     append_int(encoded, data[43], 2, 100)
-
+    append_int(encoded, data[44], 2, 100)
+    append_int(encoded, data[45], 2, 100)
+    append_int(encoded, data[46], 2, 100)
     # ajouter ici
     # si valeur non signée : append_uint(encoded, <valeur>, taille, facteur (optionnel) )
     # si valeur signée : append_int(encoded, <valeur>, taille, facteur (optionnel) )

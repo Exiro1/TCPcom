@@ -21,6 +21,7 @@ stop = False
 # export DISPLAY=:0.0
 # python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
 def start(IP, PORT):
+
     # pour execution depuis pc
     os.system("export DISPLAY=:0.0")
 
@@ -34,10 +35,11 @@ def start(IP, PORT):
     # lancement du thread d'écoute du port CAN
     listen_can_thr = threading.Thread(target=vesc.listen_can_thread)
     listen_can_thr.start()
-
+    #lancement du thread d'écoute du port UART
     listen_uart_thr = threading.Thread(target=listen_uart_thread)
     listen_uart_thr.start()
 
+    # (pour tester)
     data = rand_data()
 
     window = Tk()
@@ -65,6 +67,7 @@ def start(IP, PORT):
             continue
         dash.master.update_idletasks()
         dash.master.update()
+
     c.disconnect()
     vesc.stop = True
     global stop
@@ -74,7 +77,7 @@ def start(IP, PORT):
     listen_uart_thr.join()
     print("thread uart ended")
 
-
+# ecoute du port UART et décodage des valeurs
 def listen_uart_thread():
     ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     ser.flush()
@@ -137,19 +140,25 @@ def rand_data():
     data = np.append(data, np.random.rand() * 10 - 5)
     data = np.append(data, np.random.rand() * 100)
     data = np.append(data, np.random.rand() * 100)
+    data = np.append(data, np.random.rand() * 100)
+    data = np.append(data, np.random.rand() * 100)
+    data = np.append(data, np.random.rand() * 100)
+    data = np.append(data, np.random.rand() * 100)
+    data = np.append(data, np.random.rand() * 100)
 
     return data
 
-
+# décodage des données reçu par le matlab
 def on_receive(msg):
     arr = bytearray(msg)
-    lastmsgTCP[0] = arr[1] << 8 | arr[0]
-    lastmsgTCP[1] = 0.1 * (arr[3] << 8 | arr[2])
-    lastmsgTCP[2] = arr[5] << 8 | arr[4]
-    lastmsgTCP[3] = 0.1 * (toInt16(arr[7] << 8 | arr[6]))
-    lastmsgTCP[4] = 0.1 * (toInt16(arr[9] << 8 | arr[8]))
-    lastmsgTCP[5] = 0.1 * (toInt16(arr[11] << 8 | arr[10]))
-    lastmsgTCP[6] = arr[13] << 8 | arr[12]
+    if len(arr) >= 13:
+        lastmsgTCP[0] = arr[1] << 8 | arr[0]
+        lastmsgTCP[1] = 0.1 * (arr[3] << 8 | arr[2])
+        lastmsgTCP[2] = arr[5] << 8 | arr[4]
+        lastmsgTCP[3] = 0.1 * (toInt16(arr[7] << 8 | arr[6]))
+        lastmsgTCP[4] = 0.1 * (toInt16(arr[9] << 8 | arr[8]))
+        lastmsgTCP[5] = 0.1 * (toInt16(arr[11] << 8 | arr[10]))
+        lastmsgTCP[6] = arr[13] << 8 | arr[12]
 
 
 def toInt16(value):
@@ -160,7 +169,7 @@ def toInt16(value):
         vint |= toadd
     return vint
 
-
+# fonction qui arrange toutes les données récuperer dans une liste
 def get_data(vesc, tcp):
     newdata = rand_data()
 
@@ -198,6 +207,10 @@ def get_data(vesc, tcp):
     newdata[42] = lastmsgTCP[6]
 
     newdata[43] = vesc.temp_mot
+    newdata[44] = vesc.vin
+    newdata[45] = vesc.current
+    newdata[46] = vesc.wath
+
     return newdata
 
 
