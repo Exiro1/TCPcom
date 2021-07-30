@@ -1,22 +1,18 @@
 # @Date:   2021-03-22T12:52:26+01:00
 # @Last modified time: 2021-03-24T13:57:28+01:00
 
-from tkinter import *
-import os
 import math
 # from includes.chrono import *
 # from includes.test import Test
 # from includes.track_2 import Track
 from tkinter import *
-import tkinter.font as font
+
+
 # import fuel_cons_value_frame
 # changes
-import csv
-
 
 
 class Dashboard:
-
 
     def kill(self):
         self.stop = True
@@ -28,7 +24,7 @@ class Dashboard:
 
     def update_dash(self):
 
-                # VARIABLES DU DASHBOARD
+        # VARIABLES DU DASHBOARD
         self.engine_rpm = float("{:.2f}".format(self.data[0]))
         self.engine_temp = float("{:.2f}".format(self.data[1]))  # °C
         self.temp_water = float("{:.2f}".format(self.data[2]))
@@ -50,8 +46,6 @@ class Dashboard:
         self.break_value = self.data[27]
 
         self.hybride_mode = self.data[28] == 3  # False si mode HY pas activé
-
-
 
         self.engine_torque = float("{:.2f}".format(self.data[30]))  # Nm
         self.fuel_cons = float("{:.2f}".format(self.data[31]))  # mL
@@ -161,7 +155,6 @@ class Dashboard:
         self.master.bind("<Left>", lambda e: self.create_track())  # <Left> pour afficher le menu track
         self.master.bind("<Right>", lambda e: self.create_test())  # <Right> pour afficher le menu test
 
-
         # self.create_track()
 
     def __FrameDestroy(self):
@@ -182,34 +175,34 @@ class Dashboard:
         if self.soc < self.target_soc:
 
             self.TSOC_part1.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
-                                                 height=self.height_screen / 10 - self.space)
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part1.grid(column=0, row=0)
-            self. TSOC_part2.configure(bg="black",
-                                                   width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
-                                                       "width"],
-                                                   height=self.height_screen / 10 - self.space)
+            self.TSOC_part2.configure(bg="black",
+                                      width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
+                                          "width"],
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part2.grid(column=1, row=0)
-            self. TSOC_part3.configure(bg="black",
-                                                   width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
-                                                       "width"],
-                                                   height=self.height_screen / 10 - self.space)
+            self.TSOC_part3.configure(bg="black",
+                                      width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
+                                          "width"],
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_cursor_jauge_frame.configure(bg="white", width=0.01 * self.TSOC_jauge_frame["width"],
                                                    height=self.height_screen / 10 - self.space)
             self.TSOC_cursor_jauge_frame.grid(column=2, row=0)
         elif self.soc > self.target_soc:
             self.TSOC_part1.configure(bg="green",
-                                                  width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
-                                                  height=self.height_screen / 10 - self.space)
+                                      width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part1.grid(column=0, row=0)
             self.TSOC_part2.configure(bg="green",
-                                                  width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
-                                                      "width"],
-                                                  height=self.height_screen / 10 - self.space)
+                                      width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
+                                          "width"],
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part2.grid(column=2, row=0)
             self.TSOC_part3.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                 "width"],
-                                                  height=self.height_screen / 10 - self.space)
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_cursor_jauge_frame.configure(bg="white", width=0.01 * self.TSOC_jauge_frame["width"],
                                                    height=self.height_screen / 10 - self.space)
@@ -217,27 +210,25 @@ class Dashboard:
 
         elif self.soc == self.target_soc:
             self.TSOC_part1.configure(bg="green", width=self.soc / 100 * self.TSOC_jauge_frame["width"],
-                                                 height=self.height_screen / 10 - self.space)
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part1.grid(column=0, row=0)
             self.TSOC_part2.configure(bg="black", width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
                 "width"],
-                                                  height=self.height_screen / 10 - self.space)
+                                      height=self.height_screen / 10 - self.space)
             self.TSOC_part2.grid(column=1, row=0)
 
-            self.TSOC_part3.configure(width=0, bg = 'black')
+            self.TSOC_part3.configure(width=0, bg='black')
             self.TSOC_part3.grid(column=3, row=0)
-
-
 
         self.TSOC_num_label.configure(text=str(self.target_soc) + '%')
         fg = 'green'
-        if self.race_delta<0:
+        if self.race_delta < 0:
             fg = 'red'
-        self.num_raceD_label.configure(text = str(self.race_delta) + 's', fg = fg)
+        self.num_raceD_label.configure(text=str(self.race_delta) + 's', fg=fg)
         fg = 'green'
         if self.live_delta < 0:
             fg = 'red'
-        self.num_liveD_label.configure(text=str(self.live_delta) + 's',fg=fg)
+        self.num_liveD_label.configure(text=str(self.live_delta) + 's', fg=fg)
         fg = 'green'
         if self.n_1_delta < 0:
             fg = 'red'
@@ -324,25 +315,25 @@ class Dashboard:
 
         if self.soc < self.target_soc:
 
-            self. TSOC_part1 = Frame(self.TSOC_jauge_frame,
-                                               width=self.soc / 100 * self.TSOC_jauge_frame["width"],
-                                               height=self.height_screen / 10 - self.space)
-            self. TSOC_part1.grid(column=0, row=0)
-            self. TSOC_part1.configure(bg="green")
+            self.TSOC_part1 = Frame(self.TSOC_jauge_frame,
+                                    width=self.soc / 100 * self.TSOC_jauge_frame["width"],
+                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part1.grid(column=0, row=0)
+            self.TSOC_part1.configure(bg="green")
 
-            self. TSOC_part2 = Frame(self.TSOC_jauge_frame,
-                                                 width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
-                                                     "width"],
-                                                 height=self.height_screen / 10 - self.space)
-            self. TSOC_part2.grid(column=1, row=0)
-            self. TSOC_part2.configure(bg="black")
+            self.TSOC_part2 = Frame(self.TSOC_jauge_frame,
+                                    width=(self.target_soc - self.soc) / 100 * self.TSOC_jauge_frame[
+                                        "width"],
+                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part2.grid(column=1, row=0)
+            self.TSOC_part2.configure(bg="black")
 
-            self. TSOC_part3 = Frame(self.TSOC_jauge_frame,
-                                                 width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
-                                                     "width"],
-                                                 height=self.height_screen / 10 - self.space)
-            self. TSOC_part3.grid(column=3, row=0)
-            self. TSOC_part3.configure(bg="black")
+            self.TSOC_part3 = Frame(self.TSOC_jauge_frame,
+                                    width=(100 - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
+                                        "width"],
+                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part3.grid(column=3, row=0)
+            self.TSOC_part3.configure(bg="black")
 
             self.TSOC_cursor_jauge_frame = Frame(self.TSOC_jauge_frame,
                                                  width=0.01 * self.TSOC_jauge_frame["width"],
@@ -352,22 +343,22 @@ class Dashboard:
 
         elif self.soc > self.target_soc:
             self.TSOC_part1 = Frame(self.TSOC_jauge_frame,
-                                                width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
-                                                height=self.height_screen / 10 - self.space)
+                                    width=self.target_soc / 100 * self.TSOC_jauge_frame["width"],
+                                    height=self.height_screen / 10 - self.space)
             self.TSOC_part1.grid(column=0, row=0)
             self.TSOC_part1.configure(bg="green")
 
             self.TSOC_part2 = Frame(self.TSOC_jauge_frame,
-                                                width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
-                                                    "width"],
-                                                height=self.height_screen / 10 - self.space)
+                                    width=(self.soc - self.target_soc + 1) / 100 * self.TSOC_jauge_frame[
+                                        "width"],
+                                    height=self.height_screen / 10 - self.space)
             self.TSOC_part2.grid(column=2, row=0)
             self.TSOC_part2.configure(bg="green")
 
             self.TSOC_part3 = Frame(self.TSOC_jauge_frame,
-                                                width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
-                                                    "width"],
-                                                height=self.height_screen / 10 - self.space)
+                                    width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
+                                        "width"],
+                                    height=self.height_screen / 10 - self.space)
             self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_part3.configure(bg="black")
 
@@ -378,16 +369,16 @@ class Dashboard:
             self.TSOC_cursor_jauge_frame.configure(bg="white")
 
         elif self.soc == self.target_soc:
-            self. TSOC_part1 = Frame(self.TSOC_jauge_frame,
-                                               width=self.soc / 100 * self.TSOC_jauge_frame["width"],
-                                               height=self.height_screen / 10 - self.space)
-            self. TSOC_part1.grid(column=0, row=0)
-            self. TSOC_part1.configure(bg="green")
+            self.TSOC_part1 = Frame(self.TSOC_jauge_frame,
+                                    width=self.soc / 100 * self.TSOC_jauge_frame["width"],
+                                    height=self.height_screen / 10 - self.space)
+            self.TSOC_part1.grid(column=0, row=0)
+            self.TSOC_part1.configure(bg="green")
 
             self.TSOC_part2 = Frame(self.TSOC_jauge_frame,
-                                                width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
-                                                    "width"],
-                                                height=self.height_screen / 10 - self.space)
+                                    width=(100 - self.soc) / 100 * self.TSOC_jauge_frame[
+                                        "width"],
+                                    height=self.height_screen / 10 - self.space)
             self.TSOC_part2.grid(column=1, row=0)
             self.TSOC_part2.configure(bg="black")
 
@@ -396,8 +387,6 @@ class Dashboard:
                                     height=self.height_screen / 10 - self.space)
             self.TSOC_part3.grid(column=3, row=0)
             self.TSOC_part3.configure(bg="black")
-
-
 
         self.TSOC_num_frame = Frame(self.TSOC_frame)
         self.TSOC_num_frame.grid(column=0, row=1, sticky='w')
@@ -601,7 +590,7 @@ class Dashboard:
 
     def update_test(self):
 
-        #self.rpm_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
+        # self.rpm_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
         #                       height=self.height_screen / 8 - self.space)
 
         self.master.configure(bg="black", highlightbackground=self.hy_background, highlightcolor=self.hy_background)
@@ -622,7 +611,6 @@ class Dashboard:
         self.rpm_motor_value_label.configure(text=self.motor_rpm)
         self.rpm_motor_value_label.pack()
 
-
         self.torque_motor_value_label.configure(text=self.motor_torque)
 
         self.motor_temp_value_label.configure(text=self.motor_temp)
@@ -631,17 +619,14 @@ class Dashboard:
 
         self.efficiency_value_label.configure(text=self.efficiency)
 
-
-
         self.ice_clutch2_value_frame.configure(bg=self.clutch2_background, highlightbackground=self.clutch2_contour,
                                                highlightthickness=2)
 
-        self.ice_clutch2_value_label.configure(text=self.clutch2_value,bg = self.ice_clutch2_value_frame["bg"])
-
+        self.ice_clutch2_value_label.configure(text=self.clutch2_value, bg=self.ice_clutch2_value_frame["bg"])
 
         self.ice_clutch1_value_frame.configure(bg=self.clutch1_background, highlightbackground=self.clutch1_contour)
 
-        self.ice_clutch1_value_label.configure(text = self.clutch1_value, bg = self.ice_clutch1_value_frame["bg"])
+        self.ice_clutch1_value_label.configure(text=self.clutch1_value, bg=self.ice_clutch1_value_frame["bg"])
         # self.spacer ligne blanch
 
         self.fuel_mode_frame.configure(bg=self.fuel_mode_background, highlightbackground=self.fuel_mode_contour,
@@ -652,7 +637,7 @@ class Dashboard:
         self.fuel_mode_label.configure(bg=self.fuel_mode_frame["bg"])
         self.fuel_label.configure(bg=self.fuel_mode_frame["bg"])
 
-        self.lipo_value_label.configure(text="%s%s" % (int(self.lipo)/10, "%"))
+        self.lipo_value_label.configure(text="%s%s" % (int(self.lipo) / 10, "%"))
 
         # 3G
 
@@ -668,9 +653,7 @@ class Dashboard:
 
         self.gps_label.configure(bg=self.gps_frame["bg"], fg=self.etat_gps_label, font=self.font_titre_donnees)
 
-
-        self.soc_value_label.configure(text = str(int(self.soc)) + '%')
-
+        self.soc_value_label.configure(text=str(int(self.soc)) + '%')
 
         # Speed
 
@@ -690,20 +673,20 @@ class Dashboard:
         self.master.rowconfigure(5, minsize=self.height_screen / 8)
         self.master.rowconfigure(6, minsize=5)
         self.master.rowconfigure(7, minsize=self.height_screen / 8)
-        self.master.rowconfigure(8,weight=2)
+        self.master.rowconfigure(8, weight=2)
 
-        self.master.columnconfigure(0,weight=1, minsize=0)
-        self.master.columnconfigure(1,weight=1, minsize=self.width_screen/8)
-        self.master.columnconfigure(2,weight=4, minsize=0)
-        self.master.columnconfigure(3,weight=1, minsize=0)
-        self.master.columnconfigure(4,weight=1, minsize=0)
-        self.master.columnconfigure(5,weight=4, minsize=0)
-        self.master.columnconfigure(6,weight=1, minsize=self.width_screen/4)
-        self.master.columnconfigure(7,weight=1, minsize=0)
+        self.master.columnconfigure(0, weight=1, minsize=0)
+        self.master.columnconfigure(1, weight=1, minsize=self.width_screen / 8)
+        self.master.columnconfigure(2, weight=4, minsize=0)
+        self.master.columnconfigure(3, weight=1, minsize=0)
+        self.master.columnconfigure(4, weight=1, minsize=0)
+        self.master.columnconfigure(5, weight=4, minsize=0)
+        self.master.columnconfigure(6, weight=1, minsize=self.width_screen / 4)
+        self.master.columnconfigure(7, weight=1, minsize=0)
 
         self.hybride_mode_frame = Frame(self.master)
         self.hybride_mode_frame.grid(column=0, row=8)
-        #self.hybride_mode_frame.pack_propagate(0)
+        # self.hybride_mode_frame.pack_propagate(0)
         self.hybride_mode_frame.configure(bg="black")
 
         self.hybride_mode_label = Label(self.hybride_mode_frame, text="HY")
@@ -715,7 +698,7 @@ class Dashboard:
         self.engine_rpm_frame = Frame(self.master)
         self.engine_rpm_frame.grid(column=0, row=0)
         self.engine_rpm_frame.configure(bg="black")
-        #self.engine_rpm_frame.pack_propagate(0)
+        # self.engine_rpm_frame.pack_propagate(0)
 
         self.engine_rpm_label = Label(self.engine_rpm_frame, text="Engine")
         self.engine_rpm_label.pack(side=RIGHT)
@@ -724,7 +707,7 @@ class Dashboard:
         self.engine_rpm_frame = Frame(self.master)
         self.engine_rpm_frame.grid(column=1, row=0)
         self.engine_rpm_frame.configure(bg="black")
-        #self.engine_rpm_frame.pack_propagate(0)
+        # self.engine_rpm_frame.pack_propagate(0)
 
         self.engine_rpm_label = Label(self.engine_rpm_frame, text="RPM")
         self.engine_rpm_label.pack(side=LEFT)
@@ -733,7 +716,7 @@ class Dashboard:
         self.engine_rpm_value_frame = Frame(self.master)
         self.engine_rpm_value_frame.grid(column=2, row=0)
         self.engine_rpm_value_frame.configure(bg="black")
-        #self.engine_rpm_value_frame.pack_propagate(0)
+        # self.engine_rpm_value_frame.pack_propagate(0)
 
         self.engine_rpm_value_label = Label(self.engine_rpm_value_frame, text=self.engine_rpm)
         self.engine_rpm_value_label.pack()
@@ -741,7 +724,7 @@ class Dashboard:
         self.rpm_frame = Frame(self.master)
         self.rpm_frame.grid(column=3, row=0)
         self.rpm_frame.configure(bg="black")
-        #self.rpm_frame.pack_propagate(0)
+        # self.rpm_frame.pack_propagate(0)
         self.rpm_label = Label(self.rpm_frame, text="RPM")
         self.rpm_label.pack(anchor="w", side=LEFT)
         self.rpm_label.configure(bg=self.engine_rpm_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -751,7 +734,7 @@ class Dashboard:
         self.engine_torque_frame = Frame(self.master)
         self.engine_torque_frame.grid(column=0, row=1)
         self.engine_torque_frame.configure(bg="black")
-        #self.engine_torque_frame.pack_propagate(0)
+        # self.engine_torque_frame.pack_propagate(0)
 
         self.engine_torque_label = Label(self.engine_torque_frame, text="Engine")
         self.engine_torque_label.pack(side=RIGHT)
@@ -760,7 +743,7 @@ class Dashboard:
         self.engine_torque_frame = Frame(self.master)
         self.engine_torque_frame.grid(column=1, row=1)
         self.engine_torque_frame.configure(bg="black")
-        #self.engine_torque_frame.pack_propagate(0)
+        # self.engine_torque_frame.pack_propagate(0)
 
         self.engine_torque_label = Label(self.engine_torque_frame, text="Torque")
         self.engine_torque_label.pack(side=LEFT)
@@ -769,7 +752,7 @@ class Dashboard:
         self.engine_torque_value_frame = Frame(self.master)
         self.engine_torque_value_frame.grid(column=2, row=1)
         self.engine_torque_value_frame.configure(bg="black")
-        #self.engine_torque_value_frame.pack_propagate(0)
+        # self.engine_torque_value_frame.pack_propagate(0)
 
         self.engine_torque_value_label = Label(self.engine_torque_value_frame, text=self.engine_torque)
         self.engine_torque_value_label.pack()
@@ -778,7 +761,7 @@ class Dashboard:
         self.torque_frame = Frame(self.master)
         self.torque_frame.grid(column=3, row=1)
         self.torque_frame.configure(bg="black")
-        #self.torque_frame.pack_propagate(0)
+        # self.torque_frame.pack_propagate(0)
         self.torque_label = Label(self.torque_frame, text="Nm")
         self.torque_label.pack(anchor="w", side=LEFT)
         self.torque_label.configure(bg=self.engine_torque_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -788,7 +771,7 @@ class Dashboard:
         self.engine_temp_frame = Frame(self.master)
         self.engine_temp_frame.grid(column=0, row=2)
         self.engine_temp_frame.configure(bg="black")
-        #self.engine_temp_frame.pack_propagate(0)
+        # self.engine_temp_frame.pack_propagate(0)
 
         self.engine_temp_label = Label(self.engine_temp_frame, text="Engine")
         self.engine_temp_label.pack(side=RIGHT)
@@ -797,7 +780,7 @@ class Dashboard:
         self.engine_temp_frame = Frame(self.master)
         self.engine_temp_frame.grid(column=1, row=2)
         self.engine_temp_frame.configure(bg="black")
-        #self.engine_temp_frame.pack_propagate(0)
+        # self.engine_temp_frame.pack_propagate(0)
 
         self.engine_temp_label = Label(self.engine_temp_frame, text="Temp.")
         self.engine_temp_label.pack(side=LEFT)
@@ -806,7 +789,7 @@ class Dashboard:
         self.engine_temp_value_frame = Frame(self.master)
         self.engine_temp_value_frame.grid(column=2, row=2)
         self.engine_temp_value_frame.configure(bg="black")
-        #self.engine_temp_value_frame.pack_propagate(0)
+        # self.engine_temp_value_frame.pack_propagate(0)
 
         self.engine_temp_value_label = Label(self.engine_temp_value_frame, text=self.engine_temp)
         self.engine_temp_value_label.pack()
@@ -815,7 +798,7 @@ class Dashboard:
         self.temp_frame = Frame(self.master)
         self.temp_frame.grid(column=3, row=2)
         self.temp_frame.configure(bg="black")
-        #self.temp_frame.pack_propagate(0)
+        # self.temp_frame.pack_propagate(0)
         self.temp_label = Label(self.temp_frame, text="°C")
         self.temp_label.pack(anchor="w", side=LEFT)
         self.temp_label.configure(bg=self.engine_temp_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -825,7 +808,7 @@ class Dashboard:
         self.p_fuel_frame = Frame(self.master)
         self.p_fuel_frame.grid(column=0, row=3)
         self.p_fuel_frame.configure(bg="black")
-        #self.p_fuel_frame.pack_propagate(0)
+        # self.p_fuel_frame.pack_propagate(0)
 
         self.p_fuel_label = Label(self.p_fuel_frame, text="P Fuel")
         self.p_fuel_label.pack(side=RIGHT)
@@ -834,7 +817,7 @@ class Dashboard:
         self.p_fuel_value_frame = Frame(self.master)
         self.p_fuel_value_frame.grid(column=2, row=3)
         self.p_fuel_value_frame.configure(bg="black")
-        #self.p_fuel_value_frame.pack_propagate(0)
+        # self.p_fuel_value_frame.pack_propagate(0)
 
         self.p_fuel_value_label = Label(self.p_fuel_value_frame, text=self.p_fuel)
         self.p_fuel_value_label.pack()
@@ -842,7 +825,7 @@ class Dashboard:
         self.p_fuel_unit_frame = Frame(self.master)
         self.p_fuel_unit_frame.grid(column=3, row=3)
         self.p_fuel_unit_frame.configure(bg="black")
-        #self.p_fuel_unit_frame.pack_propagate(0)
+        # self.p_fuel_unit_frame.pack_propagate(0)
         self.p_fuel_unit_label = Label(self.p_fuel_unit_frame, text="bars")
         self.p_fuel_unit_label.pack(anchor="w", side=LEFT)
         self.p_fuel_unit_label.configure(bg=self.p_fuel_unit_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -852,7 +835,7 @@ class Dashboard:
         self.fuel_cons_frame = Frame(self.master)
         self.fuel_cons_frame.grid(column=0, row=4)
         self.fuel_cons_frame.configure(bg="black")
-        #self.fuel_cons_frame.pack_propagate(0)
+        # self.fuel_cons_frame.pack_propagate(0)
 
         self.fuel_cons_label = Label(self.fuel_cons_frame, text="Fuel")
         self.fuel_cons_label.pack(side=RIGHT)
@@ -861,7 +844,7 @@ class Dashboard:
         self.fuel_cons_frame = Frame(self.master)
         self.fuel_cons_frame.grid(column=1, row=4)
         self.fuel_cons_frame.configure(bg="black")
-        #self.fuel_cons_frame.pack_propagate(0)
+        # self.fuel_cons_frame.pack_propagate(0)
 
         self.fuel_cons_label = Label(self.fuel_cons_frame, text="Cons.")
         self.fuel_cons_label.pack(side=LEFT)
@@ -870,7 +853,7 @@ class Dashboard:
         self.fuel_cons_value_frame = Frame(self.master)
         self.fuel_cons_value_frame.grid(column=2, row=4)
         self.fuel_cons_value_frame.configure(bg="black")
-        #self.fuel_cons_value_frame.pack_propagate(0)
+        # self.fuel_cons_value_frame.pack_propagate(0)
 
         self.fuel_cons_value_label = Label(self.fuel_cons_value_frame, text=self.fuel_cons)
         self.fuel_cons_value_label.pack()
@@ -878,7 +861,7 @@ class Dashboard:
         self.fuel_frame = Frame(self.master)
         self.fuel_frame.grid(column=3, row=4)
         self.fuel_frame.configure(bg="black")
-        #self.fuel_frame.pack_propagate(0)
+        # self.fuel_frame.pack_propagate(0)
         self.fuel_label = Label(self.fuel_frame, text="mL")
         self.fuel_label.pack(anchor="w", side=LEFT)
         self.fuel_label.configure(bg=self.fuel_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -888,7 +871,7 @@ class Dashboard:
         self.ice_clutch1_frame = Frame(self.master)
         self.ice_clutch1_frame.grid(column=0, row=5)
         self.ice_clutch1_frame.configure(bg="black")
-        #self.ice_clutch1_frame.pack_propagate(0)
+        # self.ice_clutch1_frame.pack_propagate(0)
 
         self.ice_clutch1_label = Label(self.ice_clutch1_frame, text="ICE")
         self.ice_clutch1_label.pack(side=RIGHT)
@@ -897,15 +880,15 @@ class Dashboard:
         self.ice_clutch1_frame = Frame(self.master)
         self.ice_clutch1_frame.grid(column=1, row=5)
         self.ice_clutch1_frame.configure(bg="black")
-        #self.ice_clutch1_frame.pack_propagate(0)
+        # self.ice_clutch1_frame.pack_propagate(0)
 
         self.ice_clutch1_label = Label(self.ice_clutch1_frame, text="Clutch")
         self.ice_clutch1_label.pack(side=LEFT)
         self.ice_clutch1_label.configure(bg=self.ice_clutch1_frame["bg"], fg="white", font=self.font_titre)
 
         self.ice_clutch1_value_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
-                                height=self.height_screen / 8 - self.space)
-        self.ice_clutch1_value_frame.grid(column=2, row=5,)
+                                             height=self.height_screen / 8 - self.space)
+        self.ice_clutch1_value_frame.grid(column=2, row=5, )
         self.ice_clutch1_value_frame.configure(bg=self.clutch1_background, highlightbackground=self.clutch1_contour,
                                                highlightthickness=2)
         self.ice_clutch1_value_frame.pack_propagate(0)
@@ -920,7 +903,7 @@ class Dashboard:
         self.rpm_motor_frame = Frame(self.master)
         self.rpm_motor_frame.grid(column=4, row=0)
         self.rpm_motor_frame.configure(bg="black")
-        #self.rpm_motor_frame.pack_propagate(0)
+        # self.rpm_motor_frame.pack_propagate(0)
 
         self.rpm_motor_label = Label(self.rpm_motor_frame, text="RPM")
         self.rpm_motor_label.pack(side=RIGHT)
@@ -929,7 +912,7 @@ class Dashboard:
         self.rpm_motor_frame = Frame(self.master)
         self.rpm_motor_frame.grid(column=5, row=0)
         self.rpm_motor_frame.configure(bg="black")
-        #self.rpm_motor_frame.pack_propagate(0)
+        # self.rpm_motor_frame.pack_propagate(0)
 
         self.rpm_motor_label = Label(self.rpm_motor_frame, text="Motor")
         self.rpm_motor_label.pack(side=LEFT)
@@ -938,7 +921,7 @@ class Dashboard:
         self.rpm_motor_value_frame = Frame(self.master)
         self.rpm_motor_value_frame.grid(column=6, row=0)
         self.rpm_motor_value_frame.configure(bg="black")
-        #self.rpm_motor_value_frame.pack_propagate(0)
+        # self.rpm_motor_value_frame.pack_propagate(0)
 
         self.rpm_motor_value_label = Label(self.rpm_motor_value_frame, text=self.motor_rpm)
         self.rpm_motor_value_label.pack()
@@ -947,7 +930,7 @@ class Dashboard:
                                height=self.height_screen / 8 - self.space)
         self.rpm_frame.grid(column=7, row=0)
         self.rpm_frame.configure(bg="black")
-        #self.rpm_frame.pack_propagate(0)
+        # self.rpm_frame.pack_propagate(0)
         self.rpm_label = Label(self.rpm_frame, text="RPM")
         self.rpm_label.pack(anchor="w", side=LEFT)
         self.rpm_label.configure(bg=self.engine_rpm_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -957,7 +940,7 @@ class Dashboard:
         self.torque_motor_frame = Frame(self.master)
         self.torque_motor_frame.grid(column=4, row=1)
         self.torque_motor_frame.configure(bg="black")
-        #self.torque_motor_frame.pack_propagate(0)
+        # self.torque_motor_frame.pack_propagate(0)
 
         self.torque_motor_label = Label(self.torque_motor_frame, text="Torque")
         self.torque_motor_label.pack(side=RIGHT)
@@ -966,7 +949,7 @@ class Dashboard:
         self.torque_motor_frame = Frame(self.master)
         self.torque_motor_frame.grid(column=5, row=1)
         self.torque_motor_frame.configure(bg="black")
-        #self.torque_motor_frame.pack_propagate(0)
+        # self.torque_motor_frame.pack_propagate(0)
 
         self.torque_motor_label = Label(self.torque_motor_frame, text="motor")
         self.torque_motor_label.pack(side=LEFT)
@@ -975,7 +958,7 @@ class Dashboard:
         self.torque_motor_value_frame = Frame(self.master)
         self.torque_motor_value_frame.grid(column=6, row=1)
         self.torque_motor_value_frame.configure(bg="black")
-        #self.torque_motor_value_frame.pack_propagate(0)
+        # self.torque_motor_value_frame.pack_propagate(0)
 
         self.torque_motor_value_label = Label(self.torque_motor_value_frame, text=self.motor_torque)
         self.torque_motor_value_label.pack()
@@ -984,7 +967,7 @@ class Dashboard:
         self.torque_frame = Frame(self.master)
         self.torque_frame.grid(column=7, row=1)
         self.torque_frame.configure(bg="black")
-        #self.torque_frame.pack_propagate(0)
+        # self.torque_frame.pack_propagate(0)
         self.torque_label = Label(self.torque_frame, text="Nm")
         self.torque_label.pack(anchor="w", side=LEFT)
         self.torque_label.configure(bg=self.torque_motor_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -994,7 +977,7 @@ class Dashboard:
         self.motor_temp_frame = Frame(self.master)
         self.motor_temp_frame.grid(column=4, row=2)
         self.motor_temp_frame.configure(bg="black")
-        #self.motor_temp_frame.pack_propagate(0)
+        # self.motor_temp_frame.pack_propagate(0)
 
         self.motor_temp_label = Label(self.motor_temp_frame, text="Motor")
         self.motor_temp_label.pack(side=RIGHT)
@@ -1003,7 +986,7 @@ class Dashboard:
         self.motor_temp_frame = Frame(self.master)
         self.motor_temp_frame.grid(column=5, row=2)
         self.motor_temp_frame.configure(bg="black")
-        #self.motor_temp_frame.pack_propagate(0)
+        # self.motor_temp_frame.pack_propagate(0)
 
         self.motor_temp_label = Label(self.motor_temp_frame, text="Temp.")
         self.motor_temp_label.pack(side=LEFT)
@@ -1012,7 +995,7 @@ class Dashboard:
         self.motor_temp_value_frame = Frame(self.master)
         self.motor_temp_value_frame.grid(column=6, row=2)
         self.motor_temp_value_frame.configure(bg="black")
-        #self.motor_temp_value_frame.pack_propagate(0)
+        # self.motor_temp_value_frame.pack_propagate(0)
 
         self.motor_temp_value_label = Label(self.motor_temp_value_frame, text=self.motor_temp)
         self.motor_temp_value_label.pack()
@@ -1020,7 +1003,7 @@ class Dashboard:
         self.temp_frame = Frame(self.master)
         self.temp_frame.grid(column=7, row=2)
         self.temp_frame.configure(bg="black")
-        #self.temp_frame.pack_propagate(0)
+        # self.temp_frame.pack_propagate(0)
         self.temp_label = Label(self.temp_frame, text="°C")
         self.temp_label.pack(anchor="w", side=LEFT)
         self.temp_label.configure(bg=self.motor_temp_value_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -1030,7 +1013,7 @@ class Dashboard:
         self.distance_frame = Frame(self.master)
         self.distance_frame.grid(column=5, row=3)
         self.distance_frame.configure(bg="black")
-        #self.distance_frame.pack_propagate(0)
+        # self.distance_frame.pack_propagate(0)
 
         self.distance_label = Label(self.distance_frame, text="Distance")
         self.distance_label.pack(side=RIGHT)
@@ -1039,7 +1022,7 @@ class Dashboard:
         self.distance_value_frame = Frame(self.master)
         self.distance_value_frame.grid(column=6, row=3)
         self.distance_value_frame.configure(bg="black")
-        #self.distance_value_frame.pack_propagate(0)
+        # self.distance_value_frame.pack_propagate(0)
 
         self.distance_value_label = Label(self.distance_value_frame, text=self.distance)
         self.distance_value_label.pack()
@@ -1047,7 +1030,7 @@ class Dashboard:
         self.distance_unit_frame = Frame(self.master)
         self.distance_unit_frame.grid(column=7, row=3)
         self.distance_unit_frame.configure(bg="black")
-        #self.distance_unit_frame.pack_propagate(0)
+        # self.distance_unit_frame.pack_propagate(0)
         self.distance_unit_label = Label(self.distance_unit_frame, text="km")
         self.distance_unit_label.pack(anchor="w", side=LEFT)
         self.distance_unit_label.configure(bg=self.distance_unit_frame["bg"], fg="yellow", font=self.font_titre_donnees)
@@ -1057,7 +1040,7 @@ class Dashboard:
         self.efficiency_frame = Frame(self.master)
         self.efficiency_frame.grid(column=5, row=4)
         self.efficiency_frame.configure(bg="black")
-        #self.efficiency_frame.pack_propagate(0)
+        # self.efficiency_frame.pack_propagate(0)
 
         self.efficiency_label = Label(self.efficiency_frame, text="Efficiency")
         self.efficiency_label.pack(side=RIGHT)
@@ -1066,7 +1049,7 @@ class Dashboard:
         self.efficiency_value_frame = Frame(self.master)
         self.efficiency_value_frame.grid(column=6, row=4)
         self.efficiency_value_frame.configure(bg="black")
-        #self.efficiency_value_frame.pack_propagate(0)
+        # self.efficiency_value_frame.pack_propagate(0)
 
         self.efficiency_value_label = Label(self.efficiency_value_frame, text=self.efficiency)
         self.efficiency_value_label.pack()
@@ -1074,7 +1057,7 @@ class Dashboard:
         self.efficiency_unit_frame = Frame(self.master)
         self.efficiency_unit_frame.grid(column=7, row=4)
         self.efficiency_unit_frame.configure(bg="black")
-        #self.efficiency_unit_frame.pack_propagate(0)
+        # self.efficiency_unit_frame.pack_propagate(0)
         self.efficiency_unit_label = Label(self.efficiency_unit_frame, text="km/L")
         self.efficiency_unit_label.pack(anchor="w", side=LEFT)
         self.efficiency_unit_label.configure(bg=self.efficiency_unit_frame["bg"], fg="yellow",
@@ -1085,7 +1068,7 @@ class Dashboard:
         self.ice_clutch2_frame = Frame(self.master)
         self.ice_clutch2_frame.grid(column=4, row=5)
         self.ice_clutch2_frame.configure(bg="black")
-        #self.ice_clutch2_frame.pack_propagate(0)
+        # self.ice_clutch2_frame.pack_propagate(0)
 
         self.ice_clutch2_label = Label(self.ice_clutch2_frame, text="ICE")
         self.ice_clutch2_label.pack(side=RIGHT)
@@ -1094,14 +1077,14 @@ class Dashboard:
         self.ice_clutch2_frame = Frame(self.master)
         self.ice_clutch2_frame.grid(column=5, row=5)
         self.ice_clutch2_frame.configure(bg="black")
-        #self.ice_clutch2_frame.pack_propagate(0)
+        # self.ice_clutch2_frame.pack_propagate(0)
 
         self.ice_clutch2_label = Label(self.ice_clutch2_frame, text="Clutch")
         self.ice_clutch2_label.pack(side=LEFT)
         self.ice_clutch2_label.configure(bg=self.ice_clutch2_frame["bg"], fg="white", font=self.font_titre)
 
         self.ice_clutch2_value_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
-                                height=self.height_screen / 8 - self.space)
+                                             height=self.height_screen / 8 - self.space)
         self.ice_clutch2_value_frame.grid(column=6, row=5)
 
         self.ice_clutch2_value_frame.configure(bg=self.clutch2_background, highlightbackground=self.clutch2_contour,
@@ -1125,7 +1108,7 @@ class Dashboard:
         self.fuel_mode_frame.grid(column=1, row=7, rowspan=8)
         self.fuel_mode_frame.configure(bg=self.fuel_mode_background, highlightbackground=self.fuel_mode_contour,
                                        highlightthickness=2)
-        #self.fuel_mode_frame.pack_propagate(0)
+        # self.fuel_mode_frame.pack_propagate(0)
 
         self.fuel_label = Label(self.fuel_mode_frame, text="FUEL")
         self.fuel_label.pack()
@@ -1208,10 +1191,10 @@ class Dashboard:
         self.speed_value_frame = Frame(self.master)
         self.speed_value_frame.grid(column=6, row=8)
         self.speed_value_frame.configure(bg="black")
-        #self.speed_value_frame.pack_propagate(0)
+        # self.speed_value_frame.pack_propagate(0)
 
         self.speed_value_label = Label(self.speed_value_frame, text=self.speed)
-        self.speed_value_label.pack(expand=True, anchor=E,pady=0.5*self.space)
+        self.speed_value_label.pack(expand=True, anchor=E, pady=0.5 * self.space)
         self.speed_value_label.configure(bg=self.speed_value_frame["bg"], fg="yellow", font=self.font_vitesse)
 
         self.speed_unit_frame = Frame(self.master, width=self.width_screen / 8 - self.space,
@@ -1224,5 +1207,3 @@ class Dashboard:
         self.speed_unit_label.pack(expand=True, anchor=W)
         self.speed_unit_label.configure(bg=self.speed_unit_frame["bg"], fg="yellow", font=self.font_titre_donnees)
         self.update_test()
-
-

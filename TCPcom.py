@@ -1,6 +1,6 @@
 import socket
-import sys
 import time
+
 import numpy as np
 
 
@@ -18,6 +18,7 @@ def append_int(data, value, len, mult=1):
     v = np.int32(value * mult)
     for i in range(len):
         data.append(np.uint8((v >> (len - i - 1) * 8) & 0xff))
+
 
 # si il y a besoin d'ajouter des données à envoyer c'est ici qu'il faut le faire
 # il faudra aussi modifier le matlab pour qu'il traite ces nouvelles données
@@ -75,7 +76,7 @@ def encode_data(data):
 
 class TCPCOM:
 
-    def __init__(self, IP,PORT):
+    def __init__(self, IP, PORT):
         self.connected = False
         self.HOST = IP
         self.PORT = PORT

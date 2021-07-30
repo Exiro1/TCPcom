@@ -1,12 +1,13 @@
 import math
-import threading
-import time
+
 import can
 
 
 class VESC:
-    #
-    def __init__(self, i0, kv, kq=-1,pole=1, can_interface='can0'):
+
+    # Les calculs à effectuer sont à mettre dans updateData()
+
+    def __init__(self, i0, kv, kq=-1, pole=1, can_interface='can0'):
         self.id = 22
         self.pole = pole
         self.bus = can.interface.Bus(can_interface, bustype='socketcan', bitrate=500000)
@@ -21,6 +22,8 @@ class VESC:
         self.current = 0
         self.vin = 0
         self.wath = 0
+        self.C = 16.6
+        self.energy = 0
 
         if kq == -1:
             self.Kq = 30 / (math.pi * self.Kv)
@@ -30,6 +33,7 @@ class VESC:
         msg = can.Message(arbitration_id=id, data=data, extended_id=extended)
         self.bus.send(msg)
 
+    # envoi une commande pour changer le duty cycle
     def set_duty_cycle(self, dutyc):
         b1 = int(dutyc * 100000) & 0xFF
         b2 = (int(dutyc * 100000) & 0xFF00) >> 8
@@ -37,10 +41,12 @@ class VESC:
         b4 = (int(dutyc * 100000) & 0xFF000000) >> 24
         self.write((0x79 | 0x000), [b4, b3, b2, b1])
 
+    # envoi une commande en couple
     def set_torque(self, torque):
         amp = (torque / self.Kq) + self.i0
         self.set_current(amp)
 
+    # envoi une commande en courant
     def set_current(self, curr):
         b1 = int(curr * 1000) & 0xFF
         b2 = (int(curr * 1000) & 0xFF00) >> 8
@@ -48,6 +54,7 @@ class VESC:
         b4 = (int(curr * 1000) & 0xFF000000) >> 24
         self.write((0x79 | 0x100), [b4, b3, b2, b1])
 
+    # je suis pas sur de ce que ça fait
     def set_current_brake(self, curr):
         b1 = int(curr * 1000) & 0xFF
         b2 = (int(curr * 1000) & 0xFF00) >> 8
@@ -55,6 +62,7 @@ class VESC:
         b4 = (int(curr * 1000) & 0xFF000000) >> 24
         self.write((0x79 | 0x200), [b4, b3, b2, b1])
 
+    # envoi une commande en tours/min (RPM doit etre en veritable tours/min, pas ERPM
     def set_RPM(self, RPM):
         RPM = RPM * self.pole
         b1 = int(RPM) & 0xFF
@@ -63,6 +71,7 @@ class VESC:
         b4 = (int(RPM) & 0xFF000000) >> 24
         self.write((0x79 | 0x300), [b4, b3, b2, b1])
 
+    # passur non plus de ce que ça fait
     def set_pos(self, pos):
         b1 = int(pos * 1000000) & 0xFF
         b2 = (int(pos * 1000000) & 0xFF00) >> 8
@@ -136,8 +145,11 @@ class VESC:
         self.updateData()
         # print("\n")
 
+    # calcul des valeurs
     def updateData(self):
         self.torque = (self.current - self.i0) * self.Kq
+        self.soc = math.pow(self.vin / 48, 2) * 100
+        self.energy = 0.5 * self.C * math.pow(self.vin, 2)
 
     def listen_can_thread(self):
         while not self.stop:
@@ -146,4 +158,3 @@ class VESC:
                 pass
             else:
                 self.decode(message)
-                self.set_RPM(5000)

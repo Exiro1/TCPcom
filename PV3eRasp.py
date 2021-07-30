@@ -3,15 +3,16 @@ import os
 import sys
 import threading
 import time
-from random import random
 from tkinter import Tk
+
+import numpy as np
 import serial
 
-from TCPcom import TCPCOM, encode_data
-import numpy as np
 from CANcom import VESC
+from TCPcom import TCPCOM, encode_data
 from dashboard import Dashboard
 
+# liste stockant les valeurs reçu (par le matlab et l'arduino volant)
 lastmsgTCP = [0, 0, 0, 0, 0, 0, 0]
 lastmsgUART = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -21,10 +22,6 @@ stop = False
 # export DISPLAY=:0.0
 # python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
 def start(IP, PORT):
-
-    # pour execution depuis pc
-    os.system("export DISPLAY=:0.0")
-
     # configuration du module CAN
     os.system("sudo ip link set can0 up type can bitrate 500000")
     os.system("sudo ifconfig can0 txqueuelen 65536")
@@ -35,7 +32,7 @@ def start(IP, PORT):
     # lancement du thread d'écoute du port CAN
     listen_can_thr = threading.Thread(target=vesc.listen_can_thread)
     listen_can_thr.start()
-    #lancement du thread d'écoute du port UART
+    # lancement du thread d'écoute du port UART
     listen_uart_thr = threading.Thread(target=listen_uart_thread)
     listen_uart_thr.start()
 
@@ -76,6 +73,7 @@ def start(IP, PORT):
     print("thread can ended")
     listen_uart_thr.join()
     print("thread uart ended")
+
 
 # ecoute du port UART et décodage des valeurs
 def listen_uart_thread():
@@ -148,7 +146,10 @@ def rand_data():
 
     return data
 
+
 # décodage des données reçu par le matlab
+# à noter que matlab envoi les données dans le format little-endian
+# j'utilise partout ailleurs le big-endian
 def on_receive(msg):
     arr = bytearray(msg)
     if len(arr) >= 13:
@@ -168,6 +169,7 @@ def toInt16(value):
         toadd = toadd - pow(2, 16) + 1
         vint |= toadd
     return vint
+
 
 # fonction qui arrange toutes les données récuperer dans une liste
 def get_data(vesc, tcp):
