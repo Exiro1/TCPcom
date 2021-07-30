@@ -7,8 +7,8 @@ class VESC:
 
     # Les calculs à effectuer sont à mettre dans updateData()
 
-    def __init__(self, i0, kv, kq=-1, pole=1, can_interface='can0'):
-        self.id = 22
+    def __init__(self, i0, kv, kq=-1, pole=1, C=16.6, can_interface='can0'):
+        self.id = 0x79
         self.pole = pole
         self.bus = can.interface.Bus(can_interface, bustype='socketcan', bitrate=500000)
         self.stop = False
@@ -22,7 +22,7 @@ class VESC:
         self.current = 0
         self.vin = 0
         self.wath = 0
-        self.C = 16.6
+        self.C = C
         self.energy = 0
 
         if kq == -1:
@@ -39,7 +39,7 @@ class VESC:
         b2 = (int(dutyc * 100000) & 0xFF00) >> 8
         b3 = (int(dutyc * 100000) & 0xFF0000) >> 16
         b4 = (int(dutyc * 100000) & 0xFF000000) >> 24
-        self.write((0x79 | 0x000), [b4, b3, b2, b1])
+        self.write((self.id | 0x000), [b4, b3, b2, b1])
 
     # envoi une commande en couple
     def set_torque(self, torque):
@@ -52,7 +52,7 @@ class VESC:
         b2 = (int(curr * 1000) & 0xFF00) >> 8
         b3 = (int(curr * 1000) & 0xFF0000) >> 16
         b4 = (int(curr * 1000) & 0xFF000000) >> 24
-        self.write((0x79 | 0x100), [b4, b3, b2, b1])
+        self.write((self.id | 0x100), [b4, b3, b2, b1])
 
     # je suis pas sur de ce que ça fait
     def set_current_brake(self, curr):
@@ -60,7 +60,7 @@ class VESC:
         b2 = (int(curr * 1000) & 0xFF00) >> 8
         b3 = (int(curr * 1000) & 0xFF0000) >> 16
         b4 = (int(curr * 1000) & 0xFF000000) >> 24
-        self.write((0x79 | 0x200), [b4, b3, b2, b1])
+        self.write((self.id | 0x200), [b4, b3, b2, b1])
 
     # envoi une commande en tours/min (RPM doit etre en veritable tours/min, pas ERPM
     def set_RPM(self, RPM):
@@ -69,7 +69,7 @@ class VESC:
         b2 = (int(RPM) & 0xFF00) >> 8
         b3 = (int(RPM) & 0xFF0000) >> 16
         b4 = (int(RPM) & 0xFF000000) >> 24
-        self.write((0x79 | 0x300), [b4, b3, b2, b1])
+        self.write((self.id | 0x300), [b4, b3, b2, b1])
 
     # passur non plus de ce que ça fait
     def set_pos(self, pos):
@@ -77,7 +77,7 @@ class VESC:
         b2 = (int(pos * 1000000) & 0xFF00) >> 8
         b3 = (int(pos * 1000000) & 0xFF0000) >> 16
         b4 = (int(pos * 1000000) & 0xFF000000) >> 24
-        self.write((0x79 | 0x400), [b4, b3, b2, b1])
+        self.write((self.id | 0x400), [b4, b3, b2, b1])
 
     def toInt16(self, value):
         vint = int(value)

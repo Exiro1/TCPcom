@@ -21,6 +21,7 @@ stop = False
 
 # export DISPLAY=:0.0
 # python3 home/pi/tmp/pycharm_project_130/PV3eRasp.py -i 46.105.28.70 -p 11000
+
 def start(IP, PORT):
     # configuration du module CAN
     os.system("sudo ip link set can0 up type can bitrate 500000")
@@ -39,11 +40,14 @@ def start(IP, PORT):
     # (pour tester)
     data = rand_data()
 
+    #lancement de l'affichage
     window = Tk()
     dash = Dashboard(window, data)
 
     tic = time.time() * 1000
 
+
+    time_between_update = 1000 # temps entre chaque envoi de données au serveur (ms)
     while not dash.stop:
         if c.connected:
             recevied = c.read()
@@ -54,7 +58,7 @@ def start(IP, PORT):
         dash.data = get_data(vesc, c)
 
         # envoi des données toutes les secondes
-        if time.time() * 1000 - tic > 1000:
+        if time.time() * 1000 - tic > time_between_update:
             tic = time.time() * 1000
             if c.connected:
                 c.send_data(encode_data(dash.data))
@@ -75,7 +79,7 @@ def start(IP, PORT):
     print("thread uart ended")
 
 
-# ecoute du port UART et décodage des valeurs
+# ecoute du port UART et décodage des valeurs (il faudra peut etre change '/dev/ttyUSB0' en fonction du port utilisé)
 def listen_uart_thread():
     ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     ser.flush()
@@ -113,7 +117,7 @@ def listen_uart_thread():
             lastmsgUART[17] = toInt16(mode[0] << 8 | mode2[0])
 
 
-# genere des dnnées aléatoire (pour tester)
+# genere des données aléatoire (pour tester)
 def rand_data():
     data = np.array([])
     for i in range(12):
@@ -161,7 +165,7 @@ def on_receive(msg):
         lastmsgTCP[5] = 0.1 * (toInt16(arr[11] << 8 | arr[10]))
         lastmsgTCP[6] = arr[13] << 8 | arr[12]
 
-
+# transfome un entier 16 bits en un int (32 bits)
 def toInt16(value):
     vint = int(value)
     if vint >> 15 == 1:
@@ -222,11 +226,11 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hi:p:", ["ip=", "port="])
     except getopt.GetoptError:
-        print('PV3eRasp.py -ip <IP> -port <PORT>')
+        print('PV3eRasp.py -i <IP> -p <PORT>')
         sys.exit()
     for opt, arg in opts:
         if opt == '-h':
-            print('test.py PV3eRasp.py -ip <IP> -port <PORT>')
+            print('test.py PV3eRasp.py -i <IP> -p <PORT>')
             sys.exit()
         elif opt in ("-i", "--ip"):
             ip = arg
@@ -235,5 +239,5 @@ if __name__ == '__main__':
     if port is not None and ip is not None:
         start(ip, int(port))
     else:
-        print('PV3eRasp.py -ip <IP> -port <PORT>')
+        print('PV3eRasp.py -i <IP> -p <PORT>')
         sys.exit()

@@ -222,15 +222,15 @@ class Dashboard:
 
         self.TSOC_num_label.configure(text=str(self.target_soc) + '%')
         fg = 'green'
-        if self.race_delta < 0:
+        if self.race_delta > 0:
             fg = 'red'
         self.num_raceD_label.configure(text=str(self.race_delta) + 's', fg=fg)
         fg = 'green'
-        if self.live_delta < 0:
+        if self.live_delta > 0:
             fg = 'red'
         self.num_liveD_label.configure(text=str(self.live_delta) + 's', fg=fg)
         fg = 'green'
-        if self.n_1_delta < 0:
+        if self.n_1_delta > 0:
             fg = 'red'
         self.nD_label.configure(text=str(self.n_1_delta) + 's', fg=fg)
 
